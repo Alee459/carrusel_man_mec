@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tipos de mantenimiento</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:transparent}
+body{font-family:Arial,Helvetica,sans-serif;display:flex;justify-content:center}
+.carousel{width:min(100%,940px);overflow:hidden;padding:8px 6px 4px}
+.track{display:flex;transition:transform .45s ease;touch-action:pan-y}
+.slide{min-width:100%;display:flex;justify-content:center}
+.slide img{
+  width:100%;height:auto;display:block;
+  border-radius:14px;
+  box-shadow:0 5px 18px rgba(0,0,0,.10);
+  user-select:none;-webkit-user-drag:none;
+}
+.controls{display:flex;justify-content:center;align-items:center;gap:12px;margin-top:10px}
+.nav{
+  width:42px;height:42px;border:0;border-radius:50%;
+  background:#087c45;color:#fff;font-size:27px;line-height:1;
+  cursor:pointer;box-shadow:0 3px 10px rgba(0,0,0,.16)
+}
+.nav:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:7px;align-items:center}
+.dot{width:9px;height:9px;border-radius:50%;background:#acd1c0;cursor:pointer}
+.dot.active{background:#087c45;transform:scale(1.15)}
+@media(max-width:600px){
+  .carousel{padding:4px}
+  .nav{width:38px;height:38px}
+}
+</style>
+</head>
+<body>
+<div class="carousel">
+  <div class="track" id="track">
+
+    <div class="slide">
+      <img src="img/mantenimiento-correctivo.png" alt="Mantenimiento correctivo">
+    </div>
+
+    <div class="slide">
+      <img src="img/mantenimiento-preventivo.png" alt="Mantenimiento preventivo">
+    </div>
+
+    <div class="slide">
+      <img src="img/mantenimiento-predictivo.png" alt="Mantenimiento predictivo">
+    </div>
+
+    <div class="slide">
+      <img src="img/mantenimiento-proactivo.png" alt="Mantenimiento proactivo">
+    </div>
+
+    <div class="slide">
+      <img src="img/mantenimiento-cbm.png" alt="Mantenimiento basado en condición CBM">
+    </div>
+
+    <div class="slide">
+      <img src="img/mantenimiento-rcm.png" alt="Mantenimiento centrado en la confiabilidad RCM">
+    </div>
+
+  </div>
+
+  <div class="controls">
+    <button class="nav" id="prev" aria-label="Anterior">‹</button>
+    <div class="dots" id="dots"></div>
+    <button class="nav" id="next" aria-label="Siguiente">›</button>
+  </div>
+</div>
+
+<script>
+const track=document.getElementById('track');
+const slides=[...document.querySelectorAll('.slide')];
+const dotsBox=document.getElementById('dots');
+const prev=document.getElementById('prev');
+const next=document.getElementById('next');
+let index=0;
+
+slides.forEach((_,i)=>{
+  const d=document.createElement('span');
+  d.className='dot'+(i===0?' active':'');
+  d.onclick=()=>goTo(i);
+  dotsBox.appendChild(d);
+});
+const dots=[...document.querySelectorAll('.dot')];
+
+function goTo(i){
+  index=Math.max(0,Math.min(i,slides.length-1));
+  track.style.transform=`translateX(-${index*100}%)`;
+  dots.forEach((d,n)=>d.classList.toggle('active',n===index));
+  prev.disabled=index===0;
+  next.disabled=index===slides.length-1;
+}
+
+prev.onclick=()=>goTo(index-1);
+next.onclick=()=>goTo(index+1);
+
+let startX=0, dragging=false;
+track.addEventListener('pointerdown',e=>{
+  startX=e.clientX; dragging=true;
+});
+track.addEventListener('pointerup',e=>{
+  if(!dragging)return;
+  const dx=e.clientX-startX;
+  if(Math.abs(dx)>55)goTo(index+(dx<0?1:-1));
+  dragging=false;
+});
+track.addEventListener('pointercancel',()=>dragging=false);
+track.addEventListener('pointerleave',()=>dragging=false);
+
+goTo(0);
+</script>
+</body>
+</html>
